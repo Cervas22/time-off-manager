@@ -115,3 +115,22 @@ export function useRolPrincipal(): { rol: Rol; esAdmin: boolean; esJefe: boolean
     cargando: isLoading,
   };
 }
+
+export function useNotificacionesNoLeidas(): number {
+  const { user } = useAuth();
+  const { data } = useQuery({
+    queryKey: ["notificaciones-no-leidas", user?.id],
+    enabled: !!user,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .eq("is_read", false);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  return data ?? 0;
+}

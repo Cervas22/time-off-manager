@@ -16,7 +16,7 @@ import {
   Bell,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useMiEmpleado, useNotificacionesNoLeidas, useRolPrincipal } from "@/hooks/useAppUser";
+import { useMiEmpleado, useNotificacionesNoLeidas, useRolPrincipal } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
