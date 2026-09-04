@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedMisSolicitudesRouteImport } from './routes/_authenticated/mis-solicitudes'
+import { Route as AuthenticatedMisVacacionesRouteImport } from './routes/_authenticated/mis-vacaciones'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as AuthenticatedSolicitarPermisoRouteImport } from './routes/_authenticated/solicitar-permiso'
+import { Route as AuthenticatedSolicitarVacacionesRouteImport } from './routes/_authenticated/solicitar-vacaciones'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,32 +26,88 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedMisSolicitudesRoute =
+  AuthenticatedMisSolicitudesRouteImport.update({
+    id: '/mis-solicitudes',
+    path: '/mis-solicitudes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMisVacacionesRoute =
+  AuthenticatedMisVacacionesRouteImport.update({
+    id: '/mis-vacaciones',
+    path: '/mis-vacaciones',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   id: '/panel',
   path: '/panel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSolicitarPermisoRoute =
+  AuthenticatedSolicitarPermisoRouteImport.update({
+    id: '/solicitar-permiso',
+    path: '/solicitar-permiso',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSolicitarVacacionesRoute =
+  AuthenticatedSolicitarVacacionesRouteImport.update({
+    id: '/solicitar-vacaciones',
+    path: '/solicitar-vacaciones',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/mis-solicitudes': typeof AuthenticatedMisSolicitudesRoute
+  '/mis-vacaciones': typeof AuthenticatedMisVacacionesRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
+  '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/mis-solicitudes': typeof AuthenticatedMisSolicitudesRoute
+  '/mis-vacaciones': typeof AuthenticatedMisVacacionesRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
+  '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/mis-solicitudes': typeof AuthenticatedMisSolicitudesRoute
+  '/_authenticated/mis-vacaciones': typeof AuthenticatedMisVacacionesRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/_authenticated/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
+  '/_authenticated/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/panel'
+  fullPaths:
+    | '/'
+    | '/mis-solicitudes'
+    | '/mis-vacaciones'
+    | '/panel'
+    | '/solicitar-permiso'
+    | '/solicitar-vacaciones'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/panel'
-  id: '__root__' | '/' | '/_authenticated' | '/_authenticated/panel'
+  to:
+    | '/'
+    | '/mis-solicitudes'
+    | '/mis-vacaciones'
+    | '/panel'
+    | '/solicitar-permiso'
+    | '/solicitar-vacaciones'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/_authenticated/mis-solicitudes'
+    | '/_authenticated/mis-vacaciones'
+    | '/_authenticated/panel'
+    | '/_authenticated/solicitar-permiso'
+    | '/_authenticated/solicitar-vacaciones'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -71,6 +131,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/mis-solicitudes': {
+      id: '/_authenticated/mis-solicitudes'
+      path: '/mis-solicitudes'
+      fullPath: '/mis-solicitudes'
+      preLoaderRoute: typeof AuthenticatedMisSolicitudesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mis-vacaciones': {
+      id: '/_authenticated/mis-vacaciones'
+      path: '/mis-vacaciones'
+      fullPath: '/mis-vacaciones'
+      preLoaderRoute: typeof AuthenticatedMisVacacionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/panel': {
       id: '/_authenticated/panel'
       path: '/panel'
@@ -78,15 +152,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPanelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/solicitar-permiso': {
+      id: '/_authenticated/solicitar-permiso'
+      path: '/solicitar-permiso'
+      fullPath: '/solicitar-permiso'
+      preLoaderRoute: typeof AuthenticatedSolicitarPermisoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/solicitar-vacaciones': {
+      id: '/_authenticated/solicitar-vacaciones'
+      path: '/solicitar-vacaciones'
+      fullPath: '/solicitar-vacaciones'
+      preLoaderRoute: typeof AuthenticatedSolicitarVacacionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMisSolicitudesRoute: typeof AuthenticatedMisSolicitudesRoute
+  AuthenticatedMisVacacionesRoute: typeof AuthenticatedMisVacacionesRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedSolicitarPermisoRoute: typeof AuthenticatedSolicitarPermisoRoute
+  AuthenticatedSolicitarVacacionesRoute: typeof AuthenticatedSolicitarVacacionesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMisSolicitudesRoute: AuthenticatedMisSolicitudesRoute,
+  AuthenticatedMisVacacionesRoute: AuthenticatedMisVacacionesRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedSolicitarPermisoRoute: AuthenticatedSolicitarPermisoRoute,
+  AuthenticatedSolicitarVacacionesRoute: AuthenticatedSolicitarVacacionesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
