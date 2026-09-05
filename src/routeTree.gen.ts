@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedCalendarioRouteImport } from './routes/_authenticated/calendario'
 import { Route as AuthenticatedMisSolicitudesRouteImport } from './routes/_authenticated/mis-solicitudes'
 import { Route as AuthenticatedMisVacacionesRouteImport } from './routes/_authenticated/mis-vacaciones'
+import { Route as AuthenticatedNotificacionesRouteImport } from './routes/_authenticated/notificaciones'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedSolicitarPermisoRouteImport } from './routes/_authenticated/solicitar-permiso'
 import { Route as AuthenticatedSolicitarVacacionesRouteImport } from './routes/_authenticated/solicitar-vacaciones'
 
@@ -25,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedCalendarioRoute = AuthenticatedCalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMisSolicitudesRoute =
   AuthenticatedMisSolicitudesRouteImport.update({
@@ -38,9 +46,20 @@ const AuthenticatedMisVacacionesRoute =
     path: '/mis-vacaciones',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedNotificacionesRoute =
+  AuthenticatedNotificacionesRouteImport.update({
+    id: '/notificaciones',
+    path: '/notificaciones',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   id: '/panel',
   path: '/panel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSolicitarPermisoRoute =
@@ -58,17 +77,23 @@ const AuthenticatedSolicitarVacacionesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendario': typeof AuthenticatedCalendarioRoute
   '/mis-solicitudes': typeof AuthenticatedMisSolicitudesRoute
   '/mis-vacaciones': typeof AuthenticatedMisVacacionesRoute
+  '/notificaciones': typeof AuthenticatedNotificacionesRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendario': typeof AuthenticatedCalendarioRoute
   '/mis-solicitudes': typeof AuthenticatedMisSolicitudesRoute
   '/mis-vacaciones': typeof AuthenticatedMisVacacionesRoute
+  '/notificaciones': typeof AuthenticatedNotificacionesRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
   '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
 }
@@ -76,9 +101,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_authenticated/calendario': typeof AuthenticatedCalendarioRoute
   '/_authenticated/mis-solicitudes': typeof AuthenticatedMisSolicitudesRoute
   '/_authenticated/mis-vacaciones': typeof AuthenticatedMisVacacionesRoute
+  '/_authenticated/notificaciones': typeof AuthenticatedNotificacionesRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/_authenticated/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
 }
@@ -86,26 +114,35 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/calendario'
     | '/mis-solicitudes'
     | '/mis-vacaciones'
+    | '/notificaciones'
     | '/panel'
+    | '/perfil'
     | '/solicitar-permiso'
     | '/solicitar-vacaciones'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/calendario'
     | '/mis-solicitudes'
     | '/mis-vacaciones'
+    | '/notificaciones'
     | '/panel'
+    | '/perfil'
     | '/solicitar-permiso'
     | '/solicitar-vacaciones'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_authenticated/calendario'
     | '/_authenticated/mis-solicitudes'
     | '/_authenticated/mis-vacaciones'
+    | '/_authenticated/notificaciones'
     | '/_authenticated/panel'
+    | '/_authenticated/perfil'
     | '/_authenticated/solicitar-permiso'
     | '/_authenticated/solicitar-vacaciones'
   fileRoutesById: FileRoutesById
@@ -131,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/calendario': {
+      id: '/_authenticated/calendario'
+      path: '/calendario'
+      fullPath: '/calendario'
+      preLoaderRoute: typeof AuthenticatedCalendarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mis-solicitudes': {
       id: '/_authenticated/mis-solicitudes'
       path: '/mis-solicitudes'
@@ -145,11 +189,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMisVacacionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notificaciones': {
+      id: '/_authenticated/notificaciones'
+      path: '/notificaciones'
+      fullPath: '/notificaciones'
+      preLoaderRoute: typeof AuthenticatedNotificacionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/panel': {
       id: '/_authenticated/panel'
       path: '/panel'
       fullPath: '/panel'
       preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/solicitar-permiso': {
@@ -170,17 +228,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCalendarioRoute: typeof AuthenticatedCalendarioRoute
   AuthenticatedMisSolicitudesRoute: typeof AuthenticatedMisSolicitudesRoute
   AuthenticatedMisVacacionesRoute: typeof AuthenticatedMisVacacionesRoute
+  AuthenticatedNotificacionesRoute: typeof AuthenticatedNotificacionesRoute
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedSolicitarPermisoRoute: typeof AuthenticatedSolicitarPermisoRoute
   AuthenticatedSolicitarVacacionesRoute: typeof AuthenticatedSolicitarVacacionesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCalendarioRoute: AuthenticatedCalendarioRoute,
   AuthenticatedMisSolicitudesRoute: AuthenticatedMisSolicitudesRoute,
   AuthenticatedMisVacacionesRoute: AuthenticatedMisVacacionesRoute,
+  AuthenticatedNotificacionesRoute: AuthenticatedNotificacionesRoute,
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedSolicitarPermisoRoute: AuthenticatedSolicitarPermisoRoute,
   AuthenticatedSolicitarVacacionesRoute: AuthenticatedSolicitarVacacionesRoute,
 }
