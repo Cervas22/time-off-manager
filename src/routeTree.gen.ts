@@ -19,7 +19,9 @@ import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedSolicitarPermisoRouteImport } from './routes/_authenticated/solicitar-permiso'
 import { Route as AuthenticatedSolicitarVacacionesRouteImport } from './routes/_authenticated/solicitar-vacaciones'
+import { Route as AuthenticatedAdminAreasRouteImport } from './routes/_authenticated/admin/areas'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
+import { Route as AuthenticatedAdminEmpleadosRouteImport } from './routes/_authenticated/admin/empleados'
 import { Route as AuthenticatedAdminSolicitudesRouteImport } from './routes/_authenticated/admin/solicitudes'
 
 const IndexRoute = IndexRouteImport.update({
@@ -76,10 +78,21 @@ const AuthenticatedSolicitarVacacionesRoute =
     path: '/solicitar-vacaciones',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAreasRoute = AuthenticatedAdminAreasRouteImport.update({
+  id: '/admin/areas',
+  path: '/admin/areas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminAuditoriaRoute =
   AuthenticatedAdminAuditoriaRouteImport.update({
     id: '/admin/auditoria',
     path: '/admin/auditoria',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminEmpleadosRoute =
+  AuthenticatedAdminEmpleadosRouteImport.update({
+    id: '/admin/empleados',
+    path: '/admin/empleados',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminSolicitudesRoute =
@@ -99,7 +112,9 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
+  '/admin/areas': typeof AuthenticatedAdminAreasRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/empleados': typeof AuthenticatedAdminEmpleadosRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
 }
 export interface FileRoutesByTo {
@@ -112,7 +127,9 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
+  '/admin/areas': typeof AuthenticatedAdminAreasRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/admin/empleados': typeof AuthenticatedAdminEmpleadosRoute
   '/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
 }
 export interface FileRoutesById {
@@ -127,7 +144,9 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/_authenticated/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
+  '/_authenticated/admin/areas': typeof AuthenticatedAdminAreasRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
+  '/_authenticated/admin/empleados': typeof AuthenticatedAdminEmpleadosRoute
   '/_authenticated/admin/solicitudes': typeof AuthenticatedAdminSolicitudesRoute
 }
 export interface FileRouteTypes {
@@ -142,7 +161,9 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/solicitar-permiso'
     | '/solicitar-vacaciones'
+    | '/admin/areas'
     | '/admin/auditoria'
+    | '/admin/empleados'
     | '/admin/solicitudes'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -155,7 +176,9 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/solicitar-permiso'
     | '/solicitar-vacaciones'
+    | '/admin/areas'
     | '/admin/auditoria'
+    | '/admin/empleados'
     | '/admin/solicitudes'
   id:
     | '__root__'
@@ -169,7 +192,9 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/solicitar-permiso'
     | '/_authenticated/solicitar-vacaciones'
+    | '/_authenticated/admin/areas'
     | '/_authenticated/admin/auditoria'
+    | '/_authenticated/admin/empleados'
     | '/_authenticated/admin/solicitudes'
   fileRoutesById: FileRoutesById
 }
@@ -250,11 +275,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolicitarVacacionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/areas': {
+      id: '/_authenticated/admin/areas'
+      path: '/admin/areas'
+      fullPath: '/admin/areas'
+      preLoaderRoute: typeof AuthenticatedAdminAreasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/auditoria': {
       id: '/_authenticated/admin/auditoria'
       path: '/admin/auditoria'
       fullPath: '/admin/auditoria'
       preLoaderRoute: typeof AuthenticatedAdminAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/empleados': {
+      id: '/_authenticated/admin/empleados'
+      path: '/admin/empleados'
+      fullPath: '/admin/empleados'
+      preLoaderRoute: typeof AuthenticatedAdminEmpleadosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/solicitudes': {
@@ -276,7 +315,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedSolicitarPermisoRoute: typeof AuthenticatedSolicitarPermisoRoute
   AuthenticatedSolicitarVacacionesRoute: typeof AuthenticatedSolicitarVacacionesRoute
+  AuthenticatedAdminAreasRoute: typeof AuthenticatedAdminAreasRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
+  AuthenticatedAdminEmpleadosRoute: typeof AuthenticatedAdminEmpleadosRoute
   AuthenticatedAdminSolicitudesRoute: typeof AuthenticatedAdminSolicitudesRoute
 }
 
@@ -289,7 +330,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedSolicitarPermisoRoute: AuthenticatedSolicitarPermisoRoute,
   AuthenticatedSolicitarVacacionesRoute: AuthenticatedSolicitarVacacionesRoute,
+  AuthenticatedAdminAreasRoute: AuthenticatedAdminAreasRoute,
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
+  AuthenticatedAdminEmpleadosRoute: AuthenticatedAdminEmpleadosRoute,
   AuthenticatedAdminSolicitudesRoute: AuthenticatedAdminSolicitudesRoute,
 }
 
