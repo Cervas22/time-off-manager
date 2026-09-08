@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   CalendarDays,
   ClipboardList,
@@ -20,6 +20,8 @@ import { useMiEmpleado, useNotificacionesNoLeidas, useRolPrincipal } from "@/hoo
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useAjustes } from "@/lib/datos";
+import { aplicarTema } from "@/lib/marca";
 
 type Item = { to: string; label: string; icon: typeof Home };
 
