@@ -127,6 +127,9 @@ function AdminConfiguracion() {
         descripcion="Todas las reglas son editables: nada está fijo en el código."
       />
 
+      <SeccionMarca ajustes={ajustes} guardar={guardar} />
+      <SeccionPermisos />
+
       <div className="surface-card mb-6 p-5">
         <p className="mb-4 text-sm font-semibold">Políticas de solicitud</p>
         <div className="space-y-4">
