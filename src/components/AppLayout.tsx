@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   CalendarDays,
   ClipboardList,
@@ -20,6 +20,8 @@ import { useMiEmpleado, useNotificacionesNoLeidas, useRolPrincipal } from "@/hoo
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { useAjustes } from "@/lib/datos";
+import { aplicarTema } from "@/lib/marca";
 
 type Item = { to: string; label: string; icon: typeof Home };
 
@@ -82,17 +84,31 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function Marca() {
+  const { data: ajustes } = useAjustes();
+  const logo = typeof ajustes?.["brand_logo_url"] === "string" ? (ajustes["brand_logo_url"] as string) : null;
+  const nombre =
+    typeof ajustes?.["brand_name"] === "string" && ajustes["brand_name"]
+      ? (ajustes["brand_name"] as string)
+      : "Control de Vacaciones y Permisos";
+
+  useEffect(() => {
+    aplicarTema(ajustes?.["brand_theme"] as string | undefined);
+  }, [ajustes]);
+
   return (
     <div className="flex items-center gap-2.5 px-3 py-4">
-      <span className="grid size-9 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-        <Palmtree className="size-5" />
-      </span>
-      <span className="leading-tight">
-        <span className="block text-sm font-semibold text-sidebar-foreground">Control de</span>
-        <span className="block text-sm font-semibold text-sidebar-foreground">
-          Vacaciones y Permisos
+      {logo ? (
+        <img
+          src={logo}
+          alt="Logotipo de la empresa"
+          className="size-9 shrink-0 rounded-lg bg-sidebar-primary object-contain p-0.5"
+        />
+      ) : (
+        <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+          <Palmtree className="size-5" />
         </span>
-      </span>
+      )}
+      <span className="text-sm font-semibold leading-tight text-sidebar-foreground">{nombre}</span>
     </div>
   );
 }
