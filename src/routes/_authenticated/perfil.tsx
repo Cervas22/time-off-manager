@@ -52,7 +52,7 @@ function Perfil() {
     setGuardando(true);
     const { error } = await supabase.auth.updateUser({
       password: nueva,
-      // @ts-expect-error current_password es requerido por Lovable Cloud en cambios autenticados
+      // current_password es requerido en cambios de contraseña autenticados
       current_password: actual,
     });
     setGuardando(false);
