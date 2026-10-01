@@ -19,6 +19,7 @@ import {
 } from "@/lib/datos";
 import { supabase } from "@/integrations/supabase/client";
 import { fechaLarga } from "@/lib/tz";
+import { TEMAS, aplicarTema, prepararLogo } from "@/lib/marca";
 
 export const Route = createFileRoute("/_authenticated/admin/configuracion")({
   head: () => ({
