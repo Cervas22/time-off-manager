@@ -119,6 +119,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const { data: empleado } = useMiEmpleado();
   const { rol } = useRolPrincipal();
   const noLeidas = useNotificacionesNoLeidas();
+  const { data: ajustes } = useAjustes();
+
+  useEffect(() => {
+    aplicarTema(ajustes?.["brand_theme"] as string | undefined);
+  }, [ajustes]);
 
   const salir = async () => {
     await supabase.auth.signOut();

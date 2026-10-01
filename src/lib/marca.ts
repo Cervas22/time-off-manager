@@ -93,7 +93,7 @@ export const TEMAS: Tema[] = [
 
 export function aplicarTema(id: string | null | undefined) {
   if (typeof document === "undefined") return;
-  const tema = TEMAS.find((t) => t.id === id) ?? TEMAS[0];
+  const tema = TEMAS.find((t) => t.id === id) ?? TEMAS[0]!;
   const raiz = document.documentElement;
   for (const [k, v] of Object.entries(tema.vars)) raiz.style.setProperty(k, v);
 }
