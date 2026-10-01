@@ -233,3 +233,172 @@ function AdminConfiguracion() {
     </>
   );
 }
+
+function SeccionMarca({
+  ajustes,
+  guardar,
+}: {
+  ajustes: Record<string, unknown> | undefined;
+  guardar: (key: string, value: unknown) => Promise<void>;
+}) {
+  const [subiendo, setSubiendo] = useState(false);
+  const logo = typeof ajustes?.["brand_logo_url"] === "string" ? (ajustes["brand_logo_url"] as string) : null;
+  const tema = (ajustes?.["brand_theme"] as string) ?? "azul";
+
+  const subir = async (archivo: File | undefined) => {
+    if (!archivo) return;
+    if (archivo.size > 3 * 1024 * 1024) {
+      toast.error("La imagen es muy grande (máximo 3 MB)");
+      return;
+    }
+    setSubiendo(true);
+    try {
+      const dataUrl = await prepararLogo(archivo);
+      await guardar("brand_logo_url", dataUrl);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo cargar la imagen");
+    }
+    setSubiendo(false);
+  };
+
+  return (
+    <div className="surface-card mb-6 p-5">
+      <p className="mb-1 text-sm font-semibold">Logotipo y colores</p>
+      <p className="mb-4 text-xs text-muted-foreground">
+        El logotipo sustituye la palmera del menú. Formatos PNG, JPG o SVG, hasta 3 MB.
+      </p>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <span className="grid size-16 place-items-center overflow-hidden rounded-xl border border-border bg-muted">
+          {logo ? (
+            <img src={logo} alt="Logotipo actual de la empresa" className="size-full object-contain p-1" />
+          ) : (
+            <span className="text-xs text-muted-foreground">Sin logo</span>
+          )}
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            type="file"
+            accept="image/png,image/jpeg,image/svg+xml,image/webp"
+            className="w-60"
+            disabled={subiendo}
+            onChange={(e) => subir(e.target.files?.[0])}
+          />
+          {logo && (
+            <Button variant="outline" size="sm" onClick={() => guardar("brand_logo_url", null)}>
+              Quitar
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <Label htmlFor="brand_name">Nombre que se muestra en el menú</Label>
+        <Input
+          id="brand_name"
+          className="mt-1.5 max-w-sm"
+          defaultValue={String(ajustes?.["brand_name"] ?? "Control de Vacaciones y Permisos")}
+          onBlur={(e) => guardar("brand_name", e.target.value.trim())}
+        />
+      </div>
+
+      <div className="mt-5">
+        <Label>Gama de colores</Label>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {TEMAS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => {
+                aplicarTema(t.id);
+                guardar("brand_theme", t.id);
+              }}
+              className={
+                "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors " +
+                (tema === t.id ? "border-primary bg-primary-soft font-medium" : "border-border hover:bg-muted")
+              }
+            >
+              <span className="size-4 rounded-full" style={{ backgroundColor: t.muestra }} />
+              {t.nombre}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SeccionPermisos() {
+  const [correo, setCorreo] = useState("");
+  const [rol, setRol] = useState<"admin" | "jefe" | "empleado">("admin");
+  const [enviando, setEnviando] = useState(false);
+
+  const aplicar = async (otorgar: boolean) => {
+    const email = correo.trim().toLowerCase();
+    if (!email) {
+      toast.error("Escribe el correo de la persona");
+      return;
+    }
+    setEnviando(true);
+    const { data, error } = await supabase.rpc("admin_set_role", {
+      _email: email,
+      _role: rol,
+      _grant: otorgar,
+    });
+    setEnviando(false);
+    if (error) {
+      toast.error("No se pudo actualizar el permiso", { description: error.message });
+      return;
+    }
+    if (data === "pendiente") {
+      toast.success("Permiso programado", {
+        description: "Esa persona aún no tiene cuenta; recibirá el permiso al registrarse.",
+      });
+    } else {
+      toast.success(otorgar ? "Permiso otorgado" : "Permiso retirado");
+    }
+    setCorreo("");
+  };
+
+  return (
+    <div className="surface-card mb-6 p-5">
+      <p className="mb-1 text-sm font-semibold">Permisos de las personas</p>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Escribe el correo con el que la persona entra a la aplicación. Si todavía no tiene cuenta, el
+        permiso se le aplicará automáticamente la primera vez que entre.
+      </p>
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-56 flex-1">
+          <Label htmlFor="correo-rol">Correo</Label>
+          <Input
+            id="correo-rol"
+            type="email"
+            className="mt-1.5"
+            placeholder="persona@empresa.mx"
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="tipo-rol">Permiso</Label>
+          <select
+            id="tipo-rol"
+            value={rol}
+            onChange={(e) => setRol(e.target.value as typeof rol)}
+            className="mt-1.5 h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+          >
+            <option value="admin">Administrador</option>
+            <option value="jefe">Jefe de área</option>
+            <option value="empleado">Empleado</option>
+          </select>
+        </div>
+        <Button disabled={enviando} onClick={() => aplicar(true)}>
+          Otorgar
+        </Button>
+        <Button variant="outline" disabled={enviando} onClick={() => aplicar(false)}>
+          Quitar
+        </Button>
+      </div>
+    </div>
+  );
+}
