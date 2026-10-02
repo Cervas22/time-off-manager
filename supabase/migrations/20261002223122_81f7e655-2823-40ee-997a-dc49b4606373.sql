@@ -1,0 +1,1 @@
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS work_days smallint[] NOT NULL DEFAULT '{0,1,2,3,4}', ADD COLUMN IF NOT EXISTS is_owner boolean NOT NULL DEFAULT false;

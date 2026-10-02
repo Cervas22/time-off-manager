@@ -227,11 +227,13 @@ export type Database = {
           hire_date: string
           id: string
           is_active: boolean
+          is_owner: boolean
           manager_user_id: string | null
           position: string | null
           schedule_template_id: string | null
           updated_at: string
           user_id: string | null
+          work_days: number[]
         }
         Insert: {
           accrue_expired_days?: boolean
@@ -243,11 +245,13 @@ export type Database = {
           hire_date: string
           id?: string
           is_active?: boolean
+          is_owner?: boolean
           manager_user_id?: string | null
           position?: string | null
           schedule_template_id?: string | null
           updated_at?: string
           user_id?: string | null
+          work_days?: number[]
         }
         Update: {
           accrue_expired_days?: boolean
@@ -259,11 +263,13 @@ export type Database = {
           hire_date?: string
           id?: string
           is_active?: boolean
+          is_owner?: boolean
           manager_user_id?: string | null
           position?: string | null
           schedule_template_id?: string | null
           updated_at?: string
           user_id?: string | null
+          work_days?: number[]
         }
         Relationships: [
           {
