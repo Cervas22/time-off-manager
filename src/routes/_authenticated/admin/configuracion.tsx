@@ -194,17 +194,8 @@ function AdminConfiguracion() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="surface-card p-5">
-          <p className="mb-3 text-sm font-semibold">Días festivos</p>
-          <div className="max-h-72 space-y-1.5 overflow-y-auto text-sm">
-            {(festivos ?? []).map((f) => (
-              <div key={f.id} className="flex justify-between gap-3 border-b border-border pb-1.5">
-                <span>{f.name}</span>
-                <span className="text-muted-foreground">{fechaLarga(f.holiday_date)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <SeccionFestivos festivos={festivos ?? []} />
+
 
         <div className="surface-card p-5">
           <p className="mb-3 text-sm font-semibold">Categorías y tipos de solicitud</p>
