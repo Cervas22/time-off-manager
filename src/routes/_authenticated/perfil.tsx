@@ -40,7 +40,19 @@ function Perfil() {
   const [confirmar, setConfirmar] = useState("");
   const [guardando, setGuardando] = useState(false);
 
+  const [codigoEnviado, setCodigoEnviado] = useState(false);
+  const enviarCodigo = async () => {
+    const { error } = await supabase.auth.reauthenticate();
+    if (error) return toast.error("No se pudo enviar el código", { description: error.message });
+    setCodigoEnviado(true);
+    toast.success("Te enviamos un código de verificación a tu correo");
+  };
+
   const cambiar = async () => {
+    if (!actual.trim()) {
+      toast.error("Escribe el código que llegó a tu correo");
+      return;
+    }
     if (nueva.length < 8) {
       toast.error("La nueva contraseña debe tener al menos 8 caracteres");
       return;
@@ -52,8 +64,7 @@ function Perfil() {
     setGuardando(true);
     const { error } = await supabase.auth.updateUser({
       password: nueva,
-      // current_password es requerido en cambios de contraseña autenticados
-      current_password: actual,
+      nonce: actual.trim(),
     });
     setGuardando(false);
     if (error) {
@@ -103,11 +114,14 @@ function Perfil() {
         <div className="surface-card p-5">
           <p className="mb-4 text-sm font-semibold">Cambiar contraseña</p>
           <div className="space-y-3">
+            <Button variant="outline" onClick={enviarCodigo} className="w-full">
+              {codigoEnviado ? "Reenviar código a mi correo" : "1. Enviarme código a mi correo"}
+            </Button>
             <div className="space-y-1.5">
-              <Label htmlFor="actual">Contraseña actual</Label>
+              <Label htmlFor="actual">2. Código de verificación</Label>
               <Input
                 id="actual"
-                type="password"
+                inputMode="numeric"
                 value={actual}
                 onChange={(e) => setActual(e.target.value)}
               />

@@ -67,8 +67,14 @@ function SolicitarVacaciones() {
   );
 
   const periodo = useMemo(
-    () => calcularPeriodo(inicio, Math.max(0, dias), setFestivos),
-    [inicio, dias, setFestivos],
+    () =>
+      calcularPeriodo(
+        inicio,
+        Math.max(0, dias),
+        setFestivos,
+        new Set(((empleado as { work_days?: number[] } | null)?.work_days ?? [0, 1, 2, 3, 4])),
+      ),
+    [inicio, dias, setFestivos, empleado],
   );
 
   const { data: ausencias } = useAusencias(inicio, periodo.fin || inicio);
