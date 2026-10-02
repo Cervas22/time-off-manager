@@ -394,3 +394,57 @@ function SeccionPermisos() {
     </div>
   );
 }
+
+function SeccionFestivos({ festivos }: { festivos: { id: string; holiday_date: string; name: string }[] }) {
+  const qc = useQueryClient();
+  const [id, setId] = useState<string | null>(null);
+  const [nombre, setNombre] = useState("");
+  const [fecha, setFecha] = useState("");
+  const refrescar = () => qc.invalidateQueries({ queryKey: ["festivos"] });
+  const limpiar = () => {
+    setId(null);
+    setNombre("");
+    setFecha("");
+  };
+  const guardarF = async () => {
+    if (!nombre.trim() || !fecha) return toast.error("Escribe nombre y fecha");
+    const fila = { name: nombre.trim(), holiday_date: fecha };
+    const { error } = id
+      ? await supabase.from("holidays").update(fila).eq("id", id)
+      : await supabase.from("holidays").insert(fila);
+    if (error) return toast.error("No se pudo guardar", { description: error.message });
+    toast.success(id ? "Festivo actualizado" : "Festivo agregado");
+    limpiar();
+    refrescar();
+  };
+  const eliminar = async (fid: string) => {
+    if (!confirm("¿Eliminar este día festivo?")) return;
+    const { error } = await supabase.from("holidays").delete().eq("id", fid);
+    if (error) return toast.error("No se pudo eliminar", { description: error.message });
+    refrescar();
+  };
+  return (
+    <div className="surface-card p-5">
+      <p className="mb-3 text-sm font-semibold">Días festivos</p>
+      <div className="mb-3 flex flex-wrap gap-2">
+        <Input placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} className="min-w-40 flex-1" />
+        <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="w-40" />
+        <Button size="sm" onClick={guardarF}>{id ? "Guardar" : "Agregar"}</Button>
+        {id && <Button size="sm" variant="ghost" onClick={limpiar}>Cancelar</Button>}
+      </div>
+      <div className="max-h-72 space-y-1.5 overflow-y-auto text-sm">
+        {festivos.map((f) => (
+          <div key={f.id} className="flex items-center justify-between gap-3 border-b border-border pb-1.5">
+            <span className="min-w-0">
+              {f.name} <span className="block text-xs text-muted-foreground">{fechaLarga(f.holiday_date)}</span>
+            </span>
+            <span className="flex gap-1">
+              <Button size="sm" variant="ghost" onClick={() => { setId(f.id); setNombre(f.name); setFecha(f.holiday_date); }}>Editar</Button>
+              <Button size="sm" variant="ghost" onClick={() => eliminar(f.id)}>Eliminar</Button>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
