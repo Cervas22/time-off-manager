@@ -43,7 +43,7 @@ function Perfil() {
   const [codigoEnviado, setCodigoEnviado] = useState(false);
   const enviarCodigo = async () => {
     const { error } = await supabase.auth.reauthenticate();
-    if (error) return toast.error("No se pudo enviar el código", { description: error.message });
+    if (error) { toast.error("No se pudo enviar el código", { description: error.message }); return; }
     setCodigoEnviado(true);
     toast.success("Te enviamos un código de verificación a tu correo");
   };

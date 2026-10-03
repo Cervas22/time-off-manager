@@ -407,12 +407,12 @@ function SeccionFestivos({ festivos }: { festivos: { id: string; holiday_date: s
     setFecha("");
   };
   const guardarF = async () => {
-    if (!nombre.trim() || !fecha) return toast.error("Escribe nombre y fecha");
+    if (!nombre.trim() || !fecha) { toast.error("Escribe nombre y fecha"); return; }
     const fila = { name: nombre.trim(), holiday_date: fecha };
     const { error } = id
       ? await supabase.from("holidays").update(fila).eq("id", id)
       : await supabase.from("holidays").insert(fila);
-    if (error) return toast.error("No se pudo guardar", { description: error.message });
+    if (error) { toast.error("No se pudo guardar", { description: error.message }); return; }
     toast.success(id ? "Festivo actualizado" : "Festivo agregado");
     limpiar();
     refrescar();
@@ -420,7 +420,7 @@ function SeccionFestivos({ festivos }: { festivos: { id: string; holiday_date: s
   const eliminar = async (fid: string) => {
     if (!confirm("¿Eliminar este día festivo?")) return;
     const { error } = await supabase.from("holidays").delete().eq("id", fid);
-    if (error) return toast.error("No se pudo eliminar", { description: error.message });
+    if (error) { toast.error("No se pudo eliminar", { description: error.message }); return; }
     refrescar();
   };
   return (
