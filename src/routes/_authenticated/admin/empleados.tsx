@@ -221,7 +221,7 @@ function AdminEmpleados() {
         actorUserId: user?.id ?? null,
         accion: editando ? "editar_empleado" : "crear_empleado",
         entidad: "employees",
-        entidadId: id,
+        entidadId: id ?? null,
         antes: editando,
         despues: fila,
       });
@@ -239,7 +239,7 @@ function AdminEmpleados() {
     const activo = !e.is_active;
     if (!activo && !confirm(`¿Dar de baja a ${e.full_name}? Su historial se conserva.`)) return;
     const { error } = await supabase.from("employees").update({ is_active: activo }).eq("id", e.id);
-    if (error) return toast.error("No se pudo actualizar", { description: error.message });
+    if (error) { toast.error("No se pudo actualizar", { description: error.message }); return; }
     await registrarAuditoria({
       actorUserId: user?.id ?? null,
       accion: activo ? "reactivar_empleado" : "baja_empleado",
