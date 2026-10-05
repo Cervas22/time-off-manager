@@ -229,7 +229,15 @@ function AdminEmpleados() {
       setAbierto(false);
       refrescar();
     } catch (e) {
-      toast.error("No se pudo guardar", { description: (e as Error).message });
+      const m = (e as Error).message;
+      const amigable = m.includes("employee_number")
+        ? "Ese número de empleado ya está asignado a otra persona."
+        : m.includes("employees_email_unique")
+          ? "Ya existe un empleado con ese correo."
+          : m.includes("Database error creating") || m.includes("already been registered")
+            ? "Ese correo ya tiene una cuenta o está repetido en otro empleado."
+            : m;
+      toast.error("No se pudo guardar", { description: amigable });
     } finally {
       setGuardando(false);
     }
