@@ -49,7 +49,7 @@ function RegistrarEmpresa() {
     setEnviando(true);
     const { error } = await supabase.rpc("registrar_empresa", { _nombre: f.nombre, _rfc: f.rfc, _telefono: f.telefono });
     setEnviando(false);
-    if (error) return toast.error("No se pudo registrar", { description: error.message });
+    if (error) { toast.error("No se pudo registrar", { description: error.message }); return; }
     toast.success("¡Empresa registrada! Tienes 15 días de prueba.");
     await qc.invalidateQueries();
   };
@@ -121,7 +121,7 @@ export function CanjearCodigo() {
     setEnviando(true);
     const { data, error } = await supabase.rpc("canjear_codigo", { _codigo: codigo });
     setEnviando(false);
-    if (error) return toast.error("No se pudo activar", { description: error.message });
+    if (error) { toast.error("No se pudo activar", { description: error.message }); return; }
     toast.success(`Licencia activada hasta el ${fecha(data as string)}`);
     setCodigo("");
     await qc.invalidateQueries();

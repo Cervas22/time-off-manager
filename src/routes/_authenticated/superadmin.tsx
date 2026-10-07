@@ -55,7 +55,7 @@ function SuperAdmin() {
 
   const actualizar = async (f: Fila, cambios: { estatus?: string; fecha_vencimiento?: string }) => {
     const { error } = await supabase.from("empresas").update(cambios).eq("id", f.id);
-    if (error) return toast.error("No se pudo actualizar", { description: error.message });
+    if (error) { toast.error("No se pudo actualizar", { description: error.message }); return; }
     toast.success(`${f.nombre} actualizada`);
     qc.invalidateQueries();
   };
@@ -134,7 +134,7 @@ function Codigos() {
     const rnd = Array.from(crypto.getRandomValues(new Uint8Array(6))).map((b) => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[b % 32]).join("");
     const codigo = `LIC-${dias}D-${rnd}`;
     const { error } = await supabase.from("codigos_activacion").insert({ codigo, dias, nota: nota || null });
-    if (error) return toast.error("No se pudo generar", { description: error.message });
+    if (error) { toast.error("No se pudo generar", { description: error.message }); return; }
     navigator.clipboard?.writeText(codigo).catch(() => {});
     toast.success(`Código ${codigo} generado y copiado`);
     setNota("");
@@ -180,9 +180,9 @@ function DatosCobro() {
   const [f, setF] = useState<Partial<Cobro>>({});
   useEffect(() => { if (data) setF(data); }, [data]);
   const guardar = async () => {
-    const cambios = Object.fromEntries(CAMPOS.map(([k]) => [k, (f[k] ?? "").toString().trim() || null]));
+    const cambios: Partial<Cobro> = Object.fromEntries(CAMPOS.map(([k]) => [k, (f[k] ?? "").toString().trim() || null]));
     const { error } = await supabase.from("plataforma_cobro").update(cambios).eq("id", 1);
-    if (error) return toast.error("No se pudo guardar", { description: error.message });
+    if (error) { toast.error("No se pudo guardar", { description: error.message }); return; }
     toast.success("Datos de cobro guardados");
     qc.invalidateQueries({ queryKey: ["cobro"] });
   };
