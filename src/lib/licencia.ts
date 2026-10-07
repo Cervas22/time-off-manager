@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { hoyISO } from "@/lib/licencia-fecha";
 
-export const SUPERADMIN_EMAIL = "contabilidad@impulsoalcomercio.mx";
+export const SUPERADMIN_EMAIL = "jangeljac2001@gmail.com";
 
 export type Empresa = {
   id: string;

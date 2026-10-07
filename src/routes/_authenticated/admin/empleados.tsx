@@ -27,6 +27,7 @@ import { Cargando, VacioEstado } from "@/components/estados";
 import { useAuth, useRolPrincipal } from "@/hooks/useAuth";
 import { registrarAuditoria, useAreas, useReglasAntiguedad } from "@/lib/datos";
 import { diasPorAntiguedad, type ReglaAntiguedad } from "@/lib/reglas";
+import { usePlantillas } from "@/components/PlantillasHorario";
 import { supabase } from "@/integrations/supabase/client";
 import { agregarDias, antiguedadAnios, fechaLarga, hoyISO } from "@/lib/tz";
 import { guardarCuentaEmpleado, rolesPorCorreo } from "@/lib/cuentas.functions";
@@ -64,6 +65,7 @@ type Emp = {
   is_active: boolean;
   is_owner: boolean;
   work_days: number[];
+  schedule_template_id: string | null;
   user_id: string | null;
 };
 
@@ -75,6 +77,7 @@ type Form = {
   area_id: string;
   hire_date: string;
   work_days: number[];
+  schedule_template_id: string;
   role: Rol;
   password: string;
   is_owner: boolean;
@@ -88,6 +91,7 @@ const vacio = (): Form => ({
   area_id: "",
   hire_date: hoyISO(),
   work_days: [0, 1, 2, 3, 4],
+  schedule_template_id: "",
   role: "empleado",
   password: "",
   is_owner: false,
@@ -119,6 +123,7 @@ function AdminEmpleados() {
   const { data: areas } = useAreas();
   const { data: reglas } = useReglasAntiguedad();
   const qc = useQueryClient();
+  const { data: plantillas } = usePlantillas();
   const guardarCuenta = useServerFn(guardarCuentaEmpleado);
   const leerRoles = useServerFn(rolesPorCorreo);
 
@@ -166,6 +171,7 @@ function AdminEmpleados() {
       area_id: e.area_id ?? "",
       hire_date: e.hire_date,
       work_days: e.work_days ?? [0, 1, 2, 3, 4],
+      schedule_template_id: e.schedule_template_id ?? "",
       role: ((e.user_id && roles?.[e.user_id]) as Rol) || "empleado",
       password: "",
       is_owner: e.is_owner,
@@ -191,6 +197,7 @@ function AdminEmpleados() {
       area_id: form.area_id || null,
       hire_date: form.hire_date,
       work_days: form.work_days,
+      schedule_template_id: form.schedule_template_id || null,
       is_owner: form.is_owner,
     };
     try {
@@ -426,7 +433,7 @@ function AdminEmpleados() {
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {e.email} · {etiquetaRol(e)} ·{" "}
-                  {(e.work_days ?? []).map((d) => DIAS[d]).join(" ")} ·{" "}
+                  {(e.work_days ?? []).map((d) => DIAS[d]).join(" ")}{e.schedule_template_id && plantillas?.find((p) => p.id === e.schedule_template_id) ? ` · ${plantillas.find((p) => p.id === e.schedule_template_id)!.entrada}–${plantillas.find((p) => p.id === e.schedule_template_id)!.salida}` : ""} ·{" "}
                   {e.user_id ? "Con acceso" : "Sin acceso"}
                 </p>
               </div>
@@ -531,6 +538,24 @@ function AdminEmpleados() {
                     <SelectItem key={a.id} value={a.id}>
                       {a.name}
                     </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Plantilla de horario</Label>
+              <Select
+                value={form.schedule_template_id || "ninguna"}
+                onValueChange={(v) => {
+                  const p = plantillas?.find((x) => x.id === v);
+                  setForm((f) => ({ ...f, schedule_template_id: p ? v : "", work_days: p ? p.dias : f.work_days }));
+                }}
+              >
+                <SelectTrigger><SelectValue placeholder="Sin horario" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ninguna">Sin horario</SelectItem>
+                  {(plantillas ?? []).map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name} ({p.entrada}–{p.salida})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
