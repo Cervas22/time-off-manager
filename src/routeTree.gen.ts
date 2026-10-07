@@ -19,6 +19,7 @@ import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedSolicitarPermisoRouteImport } from './routes/_authenticated/solicitar-permiso'
 import { Route as AuthenticatedSolicitarVacacionesRouteImport } from './routes/_authenticated/solicitar-vacaciones'
+import { Route as AuthenticatedSuperadminRouteImport } from './routes/_authenticated/superadmin'
 import { Route as AuthenticatedAdminAreasRouteImport } from './routes/_authenticated/admin/areas'
 import { Route as AuthenticatedAdminAuditoriaRouteImport } from './routes/_authenticated/admin/auditoria'
 import { Route as AuthenticatedAdminConfiguracionRouteImport } from './routes/_authenticated/admin/configuracion'
@@ -80,6 +81,11 @@ const AuthenticatedSolicitarVacacionesRoute =
     path: '/solicitar-vacaciones',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSuperadminRoute = AuthenticatedSuperadminRouteImport.update({
+  id: '/superadmin',
+  path: '/superadmin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminAreasRoute = AuthenticatedAdminAreasRouteImport.update({
   id: '/admin/areas',
   path: '/admin/areas',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
+  '/superadmin': typeof AuthenticatedSuperadminRoute
   '/admin/areas': typeof AuthenticatedAdminAreasRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/configuracion': typeof AuthenticatedAdminConfiguracionRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
+  '/superadmin': typeof AuthenticatedSuperadminRoute
   '/admin/areas': typeof AuthenticatedAdminAreasRoute
   '/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/admin/configuracion': typeof AuthenticatedAdminConfiguracionRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/solicitar-permiso': typeof AuthenticatedSolicitarPermisoRoute
   '/_authenticated/solicitar-vacaciones': typeof AuthenticatedSolicitarVacacionesRoute
+  '/_authenticated/superadmin': typeof AuthenticatedSuperadminRoute
   '/_authenticated/admin/areas': typeof AuthenticatedAdminAreasRoute
   '/_authenticated/admin/auditoria': typeof AuthenticatedAdminAuditoriaRoute
   '/_authenticated/admin/configuracion': typeof AuthenticatedAdminConfiguracionRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/solicitar-permiso'
     | '/solicitar-vacaciones'
+    | '/superadmin'
     | '/admin/areas'
     | '/admin/auditoria'
     | '/admin/configuracion'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/solicitar-permiso'
     | '/solicitar-vacaciones'
+    | '/superadmin'
     | '/admin/areas'
     | '/admin/auditoria'
     | '/admin/configuracion'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/solicitar-permiso'
     | '/_authenticated/solicitar-vacaciones'
+    | '/_authenticated/superadmin'
     | '/_authenticated/admin/areas'
     | '/_authenticated/admin/auditoria'
     | '/_authenticated/admin/configuracion'
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSolicitarVacacionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/superadmin': {
+      id: '/_authenticated/superadmin'
+      path: '/superadmin'
+      fullPath: '/superadmin'
+      preLoaderRoute: typeof AuthenticatedSuperadminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/areas': {
       id: '/_authenticated/admin/areas'
       path: '/admin/areas'
@@ -354,6 +373,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedSolicitarPermisoRoute: typeof AuthenticatedSolicitarPermisoRoute
   AuthenticatedSolicitarVacacionesRoute: typeof AuthenticatedSolicitarVacacionesRoute
+  AuthenticatedSuperadminRoute: typeof AuthenticatedSuperadminRoute
   AuthenticatedAdminAreasRoute: typeof AuthenticatedAdminAreasRoute
   AuthenticatedAdminAuditoriaRoute: typeof AuthenticatedAdminAuditoriaRoute
   AuthenticatedAdminConfiguracionRoute: typeof AuthenticatedAdminConfiguracionRoute
@@ -371,6 +391,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedSolicitarPermisoRoute: AuthenticatedSolicitarPermisoRoute,
   AuthenticatedSolicitarVacacionesRoute: AuthenticatedSolicitarVacacionesRoute,
+  AuthenticatedSuperadminRoute: AuthenticatedSuperadminRoute,
   AuthenticatedAdminAreasRoute: AuthenticatedAdminAreasRoute,
   AuthenticatedAdminAuditoriaRoute: AuthenticatedAdminAuditoriaRoute,
   AuthenticatedAdminConfiguracionRoute: AuthenticatedAdminConfiguracionRoute,

@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/AppLayout";
+import { CanjearCodigo, FormasDePago } from "@/components/LicenciaGate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -128,6 +129,7 @@ function AdminConfiguracion() {
         descripcion="Todas las reglas son editables: nada está fijo en el código."
       />
 
+      <section className="space-y-3 rounded-xl border bg-card p-4"><h2 className="font-semibold">Licencia</h2><p className="text-sm text-muted-foreground">¿Tienes un código de activación o renovación? Ingrésalo aquí.</p><CanjearCodigo /><FormasDePago /></section>
       <SeccionMarca ajustes={ajustes} guardar={guardar} />
       <SeccionPermisos />
 
