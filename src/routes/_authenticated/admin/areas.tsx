@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Cargando, VacioEstado } from "@/components/estados";
 import { useRolPrincipal } from "@/hooks/useAuth";
 import { useAreas } from "@/lib/datos";
+import { PlantillasHorario } from "@/components/PlantillasHorario";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/areas")({
@@ -36,22 +37,6 @@ function AdminAreas() {
   const qc = useQueryClient();
   const [nombre, setNombre] = useState("");
   const [maximo, setMaximo] = useState(1);
-
-  const { data: horarios } = useQuery({
-    queryKey: ["horarios"],
-    enabled: esAdmin,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("schedule_templates").select("*").order("name");
-      if (error) throw error;
-      return (data ?? []) as {
-        id: string;
-        name: string;
-        description: string | null;
-        is_rotating: boolean;
-        is_night_shift: boolean;
-      }[];
-    },
-  });
 
   const crearArea = async () => {
     if (!nombre.trim()) return;
@@ -145,25 +130,7 @@ function AdminAreas() {
         </div>
       )}
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold">Plantillas de horario</h2>
-      {(horarios ?? []).length === 0 ? (
-        <VacioEstado
-          titulo="Sin plantillas de horario"
-          descripcion="Las plantillas permiten distinguir turnos fijos, rotativos y nocturnos."
-        />
-      ) : (
-        <div className="surface-card divide-y divide-border">
-          {(horarios ?? []).map((h) => (
-            <div key={h.id} className="flex flex-wrap justify-between gap-2 p-4 text-sm">
-              <span className="font-medium">{h.name}</span>
-              <span className="text-muted-foreground">
-                {h.is_rotating ? "Rotativo" : "Fijo"}
-                {h.is_night_shift ? " · Nocturno" : ""}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <PlantillasHorario />
     </>
   );
 }
