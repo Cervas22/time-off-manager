@@ -22,6 +22,9 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { cn } from "@/lib/utils";
 import { useAjustes } from "@/lib/datos";
 import { aplicarTema } from "@/lib/marca";
+import { KeyRound } from "lucide-react";
+import { LicenciaGate } from "@/components/LicenciaGate";
+import { estadoLicencia, useEsSuperadmin, useMiEmpresa } from "@/lib/licencia";
 
 type Item = { to: string; label: string; icon: typeof Home };
 
@@ -45,6 +48,7 @@ const ITEMS_ADMIN: Item[] = [
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const { esAdmin } = useRolPrincipal();
+  const esSuper = useEsSuperadmin();
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   const render = (items: Item[]) =>
@@ -79,7 +83,22 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           {render(ITEMS_ADMIN)}
         </>
       )}
+      {esSuper && render([{ to: "/superadmin", label: "Panel de licencias", icon: KeyRound }])}
+      <IndicadorLicencia />
     </nav>
+  );
+}
+
+function IndicadorLicencia() {
+  const { data: empresa } = useMiEmpresa();
+  if (!empresa) return null;
+  const est = estadoLicencia(empresa);
+  return (
+    <p className="mt-4 px-3 text-xs text-sidebar-foreground/60">
+      Licencia {est.etiqueta.toLowerCase()} · {est.dias >= 0 ? `${est.dias} días restantes` : "vencida"}
+      <br />
+      Vence: {new Date(empresa.fecha_vencimiento + "T12:00:00").toLocaleDateString("es-MX")}
+    </p>
   );
 }
 
@@ -185,7 +204,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Link>
         </header>
 
-        <main className="mx-auto w-full max-w-7xl flex-1 p-4 pb-20 sm:p-6 lg:pb-6">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 p-4 pb-20 sm:p-6 lg:pb-6">
+          <LicenciaGate>{children}</LicenciaGate>
+        </main>
       </div>
     </div>
   );
