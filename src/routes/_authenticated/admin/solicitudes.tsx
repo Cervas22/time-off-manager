@@ -23,6 +23,7 @@ import {
   useCategorias,
   useEmpleados,
   useFestivos,
+  useSolicitudesAprobadas,
   useSolicitudesPendientes,
   type Solicitud,
 } from "@/lib/datos";
@@ -51,12 +52,14 @@ function AdminSolicitudes() {
   const { user } = useAuth();
   const { esAdmin, cargando } = useRolPrincipal();
   const { data: pendientes, isLoading } = useSolicitudesPendientes();
+  const { data: aprobadas, isLoading: cargandoAprobadas } = useSolicitudesAprobadas();
   const { data: empleados } = useEmpleados();
   const { data: areas } = useAreas();
   const { data: categorias } = useCategorias();
   const { data: festivos } = useFestivos();
   const qc = useQueryClient();
 
+  const [tab, setTab] = useState<"pendientes" | "aprobadas">("pendientes");
   const [activa, setActiva] = useState<Solicitud | null>(null);
   const [comentario, setComentario] = useState("");
   const [excepcion, setExcepcion] = useState("");
@@ -64,6 +67,9 @@ function AdminSolicitudes() {
   const [nuevosDias, setNuevosDias] = useState(0);
   const [nuevaPago, setNuevaPago] = useState("");
   const [procesando, setProcesando] = useState(false);
+  const [cancelando, setCancelando] = useState<Solicitud | null>(null);
+  const [motivoCancel, setMotivoCancel] = useState("");
+  const [modificando, setModificando] = useState<Solicitud | null>(null);
 
   const setFestivos = useMemo(
     () => new Set((festivos ?? []).map((f) => f.holiday_date)),
