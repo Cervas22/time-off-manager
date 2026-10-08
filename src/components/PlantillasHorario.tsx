@@ -55,8 +55,8 @@ export function usePlantillas(enabled = true) {
 }
 
 function horas(e: string, s: string, comida: number) {
-  const [a, b] = e.split(":").map(Number);
-  const [c, d] = s.split(":").map(Number);
+  const [a = 0, b = 0] = e.split(":").map(Number);
+  const [c = 0, d = 0] = s.split(":").map(Number);
   let m = c * 60 + d - (a * 60 + b);
   if (m <= 0) m += 1440;
   return Math.max(0, (m - comida) / 60);
@@ -82,10 +82,10 @@ export function PlantillasHorario() {
   const [form, setForm] = useState<Form | null>(null);
   const [abierta, setAbierta] = useState<string | null>(null);
 
-  const guardar = async () => {
+  const guardar = async (): Promise<void> => {
     if (!form) return;
-    if (!form.name.trim()) return toast.error("Escribe un nombre");
-    if (form.dias.length === 0) return toast.error("Marca al menos un día");
+    if (!form.name.trim()) { toast.error("Escribe un nombre"); return; }
+    if (form.dias.length === 0) { toast.error("Marca al menos un día"); return; }
     const datos = {
       name: form.name.trim(), description: form.description?.trim() || null,
       is_rotating: form.is_rotating, is_night_shift: form.is_night_shift,
@@ -93,11 +93,11 @@ export function PlantillasHorario() {
     let id = form.id;
     if (id) {
       const { error } = await supabase.from("schedule_templates").update(datos).eq("id", id);
-      if (error) return toast.error("No se pudo guardar", { description: error.message });
+      if (error) { toast.error("No se pudo guardar", { description: error.message }); return; }
       await supabase.from("schedule_days").delete().eq("template_id", id);
     } else {
       const { data, error } = await supabase.from("schedule_templates").insert(datos as never).select("id").single();
-      if (error) return toast.error("No se pudo guardar", { description: error.message });
+      if (error) { toast.error("No se pudo guardar", { description: error.message }); return; }
       id = data.id;
     }
     const cruza = form.salida <= form.entrada;
@@ -109,16 +109,16 @@ export function PlantillasHorario() {
         lunch_minutes: form.comida, crosses_midnight: cruza,
       })) as never,
     );
-    if (error) return toast.error("No se pudieron guardar los días", { description: error.message });
+    if (error) { toast.error("No se pudieron guardar los días", { description: error.message }); return; }
     toast.success("Plantilla guardada");
     setForm(null);
     qc.invalidateQueries({ queryKey: ["horarios"] });
   };
 
-  const eliminar = async (p: Plantilla) => {
+  const eliminar = async (p: Plantilla): Promise<void> => {
     if (!confirm(`¿Eliminar la plantilla "${p.name}"? El personal asignado quedará sin horario.`)) return;
     const { error } = await supabase.from("schedule_templates").delete().eq("id", p.id);
-    if (error) return toast.error("No se pudo eliminar", { description: error.message });
+    if (error) { toast.error("No se pudo eliminar", { description: error.message }); return; }
     toast.success("Plantilla eliminada");
     qc.invalidateQueries({ queryKey: ["horarios"] });
     qc.invalidateQueries({ queryKey: ["empleados-horario"] });
