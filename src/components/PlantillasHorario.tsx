@@ -55,8 +55,8 @@ export function usePlantillas(enabled = true) {
 }
 
 function horas(e: string, s: string, comida: number) {
-  const [a, b] = e.split(":").map(Number);
-  const [c, d] = s.split(":").map(Number);
+  const [a = 0, b = 0] = e.split(":").map(Number);
+  const [c = 0, d = 0] = s.split(":").map(Number);
   let m = c * 60 + d - (a * 60 + b);
   if (m <= 0) m += 1440;
   return Math.max(0, (m - comida) / 60);
