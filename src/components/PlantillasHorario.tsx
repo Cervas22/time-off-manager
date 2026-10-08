@@ -93,11 +93,11 @@ export function PlantillasHorario() {
     let id = form.id;
     if (id) {
       const { error } = await supabase.from("schedule_templates").update(datos).eq("id", id);
-      if (error) return toast.error("No se pudo guardar", { description: error.message });
+      if (error) { toast.error("No se pudo guardar", { description: error.message }); return; }
       await supabase.from("schedule_days").delete().eq("template_id", id);
     } else {
       const { data, error } = await supabase.from("schedule_templates").insert(datos as never).select("id").single();
-      if (error) return toast.error("No se pudo guardar", { description: error.message });
+      if (error) { toast.error("No se pudo guardar", { description: error.message }); return; }
       id = data.id;
     }
     const cruza = form.salida <= form.entrada;
@@ -109,7 +109,7 @@ export function PlantillasHorario() {
         lunch_minutes: form.comida, crosses_midnight: cruza,
       })) as never,
     );
-    if (error) return toast.error("No se pudieron guardar los días", { description: error.message });
+    if (error) { toast.error("No se pudieron guardar los días", { description: error.message }); return; }
     toast.success("Plantilla guardada");
     setForm(null);
     qc.invalidateQueries({ queryKey: ["horarios"] });
@@ -118,7 +118,7 @@ export function PlantillasHorario() {
   const eliminar = async (p: Plantilla) => {
     if (!confirm(`¿Eliminar la plantilla "${p.name}"? El personal asignado quedará sin horario.`)) return;
     const { error } = await supabase.from("schedule_templates").delete().eq("id", p.id);
-    if (error) return toast.error("No se pudo eliminar", { description: error.message });
+    if (error) { toast.error("No se pudo eliminar", { description: error.message }); return; }
     toast.success("Plantilla eliminada");
     qc.invalidateQueries({ queryKey: ["horarios"] });
     qc.invalidateQueries({ queryKey: ["empleados-horario"] });
