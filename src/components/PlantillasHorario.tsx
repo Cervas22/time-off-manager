@@ -82,7 +82,7 @@ export function PlantillasHorario() {
   const [form, setForm] = useState<Form | null>(null);
   const [abierta, setAbierta] = useState<string | null>(null);
 
-  const guardar = async () => {
+  const guardar = async (): Promise<void> => {
     if (!form) return;
     if (!form.name.trim()) { toast.error("Escribe un nombre"); return; }
     if (form.dias.length === 0) { toast.error("Marca al menos un día"); return; }
@@ -115,7 +115,7 @@ export function PlantillasHorario() {
     qc.invalidateQueries({ queryKey: ["horarios"] });
   };
 
-  const eliminar = async (p: Plantilla) => {
+  const eliminar = async (p: Plantilla): Promise<void> => {
     if (!confirm(`¿Eliminar la plantilla "${p.name}"? El personal asignado quedará sin horario.`)) return;
     const { error } = await supabase.from("schedule_templates").delete().eq("id", p.id);
     if (error) { toast.error("No se pudo eliminar", { description: error.message }); return; }
