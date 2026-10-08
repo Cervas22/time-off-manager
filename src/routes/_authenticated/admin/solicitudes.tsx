@@ -90,8 +90,195 @@ function AdminSolicitudes() {
 
   const refrescar = () => {
     qc.invalidateQueries({ queryKey: ["solicitudes-pendientes"] });
+    qc.invalidateQueries({ queryKey: ["solicitudes-aprobadas"] });
     qc.invalidateQueries({ queryKey: ["ausencias"] });
     qc.invalidateQueries({ queryKey: ["mis-solicitudes"] });
+    qc.invalidateQueries({ queryKey: ["ciclos"] });
+    qc.invalidateQueries({ queryKey: ["pagos"] });
+  };
+
+  const abrirModificacion = (s: Solicitud) => {
+    setModificando(s);
+    setNuevoInicio(s.start_date);
+    setNuevosDias(Number(s.days_count));
+    setNuevaPago(s.payment_date ?? "");
+    setComentario("");
+  };
+
+  const cancelarAprobada = async () => {
+    if (!cancelando) return;
+    if (!motivoCancel.trim()) {
+      toast.error("El motivo de la cancelación es obligatorio");
+      return;
+    }
+    setProcesando(true);
+    const s = cancelando;
+    const porDias = s.mode === "dias_completos" && Number(s.days_count) > 0;
+
+    const { error } = await supabase
+      .from("requests")
+      .update({
+        status: "cancelada",
+        admin_comment: motivoCancel.trim(),
+        resolved_by: user?.id ?? null,
+        resolved_at: new Date().toISOString(),
+      })
+      .eq("id", s.id);
+
+    if (error) {
+      setProcesando(false);
+      toast.error("No se pudo cancelar la solicitud", { description: error.message });
+      return;
+    }
+
+    await supabase.from("absence_periods").delete().eq("request_id", s.id);
+
+    if (s.cycle_id && porDias) {
+      const { data: ciclo } = await supabase
+        .from("vacation_cycles")
+        .select("taken_days")
+        .eq("id", s.cycle_id)
+        .maybeSingle();
+      await supabase
+        .from("vacation_cycles")
+        .update({
+          taken_days: Math.max(0, Number(ciclo?.taken_days ?? 0) - Number(s.days_count)),
+        })
+        .eq("id", s.cycle_id);
+    }
+
+    await supabase
+      .from("vacation_payments")
+      .update({ status: "cancelado" })
+      .eq("request_id", s.id)
+      .eq("status", "programado");
+
+    await notificarEmpleado(
+      s,
+      "Solicitud cancelada",
+      `Tu solicitud del ${fechaLarga(s.start_date)} fue cancelada por un administrador. ` +
+        (porDias ? "Los días fueron devueltos a tu saldo. " : "") +
+        `Motivo: ${motivoCancel.trim()}`,
+    );
+    await registrarAuditoria({
+      actorUserId: user?.id ?? null,
+      accion: "cancelar_solicitud_aprobada",
+      entidad: "requests",
+      entidadId: s.id,
+      antes: s,
+      despues: { status: "cancelada", motivo: motivoCancel.trim() },
+    });
+
+    setProcesando(false);
+    setCancelando(null);
+    setMotivoCancel("");
+    refrescar();
+    toast.success("Solicitud cancelada y días reintegrados");
+  };
+
+  const guardarModificacion = async () => {
+    if (!modificando) return;
+    setProcesando(true);
+    const s = modificando;
+    const porDias = s.mode === "dias_completos";
+    const diasAntes = Number(s.days_count);
+    const dias = porDias ? nuevosDias : diasAntes;
+    const inicio = nuevoInicio || s.start_date;
+    const fin =
+      porDias && dias > 0 ? calcularPeriodo(inicio, dias, setFestivos).fin : s.end_date;
+    const pago = nuevaPago || null;
+
+    const { data: actualizada, error } = await supabase
+      .from("requests")
+      .update({
+        status: "modificada_aprobada",
+        start_date: inicio,
+        end_date: fin,
+        days_count: dias,
+        payment_date: pago,
+        admin_comment: comentario.trim() || s.admin_comment,
+        resolved_by: user?.id ?? null,
+        resolved_at: new Date().toISOString(),
+      })
+      .eq("id", s.id)
+      .select()
+      .single();
+
+    if (error) {
+      setProcesando(false);
+      toast.error("No se pudo modificar la solicitud", { description: error.message });
+      return;
+    }
+
+    await supabase
+      .from("absence_periods")
+      .update({ start_date: inicio, end_date: fin })
+      .eq("request_id", s.id);
+
+    if (s.cycle_id && porDias) {
+      const dif = dias - diasAntes;
+      if (dif !== 0) {
+        const { data: ciclo } = await supabase
+          .from("vacation_cycles")
+          .select("taken_days")
+          .eq("id", s.cycle_id)
+          .maybeSingle();
+        await supabase
+          .from("vacation_cycles")
+          .update({
+            taken_days: Math.max(0, Number(ciclo?.taken_days ?? 0) + dif),
+          })
+          .eq("id", s.cycle_id);
+      }
+    }
+
+    if (pago) {
+      const { data: pagos } = await supabase
+        .from("vacation_payments")
+        .select("id")
+        .eq("request_id", s.id)
+        .limit(1);
+      if (pagos && pagos.length > 0) {
+        await supabase
+          .from("vacation_payments")
+          .update({ payment_date: pago })
+          .eq("id", pagos[0].id);
+      } else {
+        const { data: emp } = await supabase
+          .from("employees")
+          .select("empresa_id")
+          .eq("id", s.employee_id)
+          .maybeSingle();
+        await supabase.from("vacation_payments").insert({
+          employee_id: s.employee_id,
+          cycle_id: s.cycle_id,
+          request_id: s.id,
+          payment_date: pago,
+          created_by: user?.id ?? null,
+          empresa_id: emp?.empresa_id,
+        });
+      }
+    }
+
+    await notificarEmpleado(
+      s,
+      "Solicitud modificada",
+      `Tu solicitud quedó actualizada del ${fechaLarga(inicio)} al ${fechaLarga(fin)}.` +
+        (pago ? ` Fecha de pago: ${fechaLarga(pago)}.` : ""),
+    );
+    await registrarAuditoria({
+      actorUserId: user?.id ?? null,
+      accion: "modificar_solicitud_aprobada",
+      entidad: "requests",
+      entidadId: s.id,
+      antes: s,
+      despues: actualizada,
+    });
+
+    setProcesando(false);
+    setModificando(null);
+    refrescar();
+    toast.success("Solicitud actualizada");
   };
 
   const notificarEmpleado = async (s: Solicitud, titulo: string, mensaje: string) => {
