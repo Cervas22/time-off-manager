@@ -245,6 +245,21 @@ export function useSolicitudesPendientes() {
   });
 }
 
+export function useSolicitudesAprobadas() {
+  return useQuery({
+    queryKey: ["solicitudes-aprobadas"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("requests")
+        .select("*")
+        .in("status", ["aprobada", "modificada_aprobada"])
+        .order("start_date", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Solicitud[];
+    },
+  });
+}
+
 export function useNotificaciones(userId: string | null | undefined) {
   return useQuery({
     queryKey: ["notificaciones", userId],
