@@ -84,8 +84,8 @@ export function PlantillasHorario() {
 
   const guardar = async () => {
     if (!form) return;
-    if (!form.name.trim()) return toast.error("Escribe un nombre");
-    if (form.dias.length === 0) return toast.error("Marca al menos un día");
+    if (!form.name.trim()) { toast.error("Escribe un nombre"); return; }
+    if (form.dias.length === 0) { toast.error("Marca al menos un día"); return; }
     const datos = {
       name: form.name.trim(), description: form.description?.trim() || null,
       is_rotating: form.is_rotating, is_night_shift: form.is_night_shift,
