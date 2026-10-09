@@ -401,58 +401,114 @@ function AdminSolicitudes() {
     );
 
   const lista = pendientes ?? [];
+  const listaAprobadas = aprobadas ?? [];
+
+  const tarjetaSolicitud = (s: Solicitud, acciones: React.ReactNode) => {
+    const emp = empMap.get(s.employee_id);
+    const area = emp?.area_id ? areaMap.get(emp.area_id) : undefined;
+    const cat = s.category_id ? catMap.get(s.category_id) : undefined;
+    return (
+      <div key={s.id} className="surface-card p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-semibold">{emp?.full_name ?? "Empleado"}</p>
+              <EtiquetaEstado estado={s.status} />
+              {cat && (
+                <span
+                  className="rounded-full px-2 py-0.5 text-xs font-medium text-primary-foreground"
+                  style={{ backgroundColor: cat.color }}
+                >
+                  {cat.name}
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {area?.name ?? "Sin área"} · {emp?.position ?? "Sin puesto"} · Solicitada el{" "}
+              {fechaHoraLarga(s.created_at)}
+            </p>
+            <p className="mt-2 text-sm">
+              {fechaLarga(s.start_date)}
+              {s.end_date !== s.start_date ? ` — ${fechaLarga(s.end_date)}` : ""} ·{" "}
+              {Number(s.days_count) > 0
+                ? `${Number(s.days_count)} día(s)`
+                : `${Number(s.hours_count)} hora(s)`}
+              {s.payment_date ? ` · Pago: ${fechaLarga(s.payment_date)}` : ""}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{s.reason}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">{acciones}</div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
       <PageHeader
-        titulo="Solicitudes pendientes"
-        descripcion={`${lista.length} solicitud(es) esperando revisión.`}
+        titulo="Solicitudes"
+        descripcion="Revisa las pendientes y gestiona las ya autorizadas."
       />
 
-      {lista.length === 0 ? (
-        <VacioEstado titulo="Todo revisado" descripcion="No hay solicitudes pendientes." />
-      ) : (
-        <div className="space-y-3">
-          {lista.map((s) => {
-            const emp = empMap.get(s.employee_id);
-            const area = emp?.area_id ? areaMap.get(emp.area_id) : undefined;
-            const cat = s.category_id ? catMap.get(s.category_id) : undefined;
-            return (
-              <div key={s.id} className="surface-card p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold">{emp?.full_name ?? "Empleado"}</p>
-                      <EtiquetaEstado estado={s.status} />
-                      {cat && (
-                        <span
-                          className="rounded-full px-2 py-0.5 text-xs font-medium text-primary-foreground"
-                          style={{ backgroundColor: cat.color }}
-                        >
-                          {cat.name}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {area?.name ?? "Sin área"} · {emp?.position ?? "Sin puesto"} · Solicitada el{" "}
-                      {fechaHoraLarga(s.created_at)}
-                    </p>
-                    <p className="mt-2 text-sm">
-                      {fechaLarga(s.start_date)}
-                      {s.end_date !== s.start_date ? ` — ${fechaLarga(s.end_date)}` : ""} ·{" "}
-                      {Number(s.days_count) > 0
-                        ? `${Number(s.days_count)} día(s)`
-                        : `${Number(s.hours_count)} hora(s)`}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">{s.reason}</p>
-                  </div>
-                  <Button onClick={() => abrir(s)}>Revisar</Button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <div className="mb-4 flex gap-2">
+        <Button
+          variant={tab === "pendientes" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTab("pendientes")}
+        >
+          Pendientes ({lista.length})
+        </Button>
+        <Button
+          variant={tab === "aprobadas" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTab("aprobadas")}
+        >
+          Aprobadas ({listaAprobadas.length})
+        </Button>
+      </div>
+
+      {tab === "pendientes" &&
+        (lista.length === 0 ? (
+          <VacioEstado titulo="Todo revisado" descripcion="No hay solicitudes pendientes." />
+        ) : (
+          <div className="space-y-3">
+            {lista.map((s) =>
+              tarjetaSolicitud(s, <Button onClick={() => abrir(s)}>Revisar</Button>),
+            )}
+          </div>
+        ))}
+
+      {tab === "aprobadas" &&
+        (cargandoAprobadas ? (
+          <Cargando />
+        ) : listaAprobadas.length === 0 ? (
+          <VacioEstado
+            titulo="Sin solicitudes aprobadas"
+            descripcion="Aún no hay ausencias autorizadas."
+          />
+        ) : (
+          <div className="space-y-3">
+            {listaAprobadas.map((s) =>
+              tarjetaSolicitud(
+                s,
+                <>
+                  <Button variant="secondary" onClick={() => abrirModificacion(s)}>
+                    Modificar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setCancelando(s);
+                      setMotivoCancel("");
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </>,
+              ),
+            )}
+          </div>
+        ))}
 
       <Dialog open={!!activa} onOpenChange={(o) => !o && setActiva(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
@@ -543,6 +599,119 @@ function AdminSolicitudes() {
                   onClick={() => resolver("rechazar")}
                 >
                   Rechazar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!cancelando} onOpenChange={(o) => !o && setCancelando(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancelar solicitud aprobada</DialogTitle>
+            <DialogDescription>
+              {empMap.get(cancelando?.employee_id ?? "")?.full_name} ·{" "}
+              {cancelando ? fechaLarga(cancelando.start_date) : ""}. Se liberarán las fechas del
+              calendario
+              {cancelando && cancelando.mode === "dias_completos" && Number(cancelando.days_count) > 0
+                ? " y los días volverán al saldo del empleado"
+                : ""}
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="mc">Motivo de la cancelación</Label>
+              <Textarea
+                id="mc"
+                rows={3}
+                value={motivoCancel}
+                onChange={(e) => setMotivoCancel(e.target.value)}
+                placeholder="Obligatorio. Se notificará al empleado."
+              />
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button variant="outline" disabled={procesando} onClick={() => setCancelando(null)}>
+                Volver
+              </Button>
+              <Button variant="destructive" disabled={procesando} onClick={cancelarAprobada}>
+                Confirmar cancelación
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!modificando} onOpenChange={(o) => !o && setModificando(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Modificar solicitud aprobada</DialogTitle>
+            <DialogDescription>
+              {empMap.get(modificando?.employee_id ?? "")?.full_name} ·{" "}
+              {modificando ? fechaLarga(modificando.start_date) : ""}. El saldo y el calendario se
+              ajustan automáticamente.
+            </DialogDescription>
+          </DialogHeader>
+          {modificando && (
+            <div className="space-y-4">
+              {modificando.mode === "dias_completos" ? (
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="mi">Inicio</Label>
+                    <Input
+                      id="mi"
+                      type="date"
+                      value={nuevoInicio}
+                      onChange={(e) => setNuevoInicio(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="md">Días</Label>
+                    <Input
+                      id="md"
+                      type="number"
+                      min={0}
+                      value={nuevosDias}
+                      onChange={(e) => setNuevosDias(Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="mp">Pago</Label>
+                    <Input
+                      id="mp"
+                      type="date"
+                      value={nuevaPago}
+                      onChange={(e) => setNuevaPago(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Label htmlFor="mp2">Fecha de pago</Label>
+                  <Input
+                    id="mp2"
+                    type="date"
+                    value={nuevaPago}
+                    onChange={(e) => setNuevaPago(e.target.value)}
+                  />
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="mcom">Comentario para el empleado (opcional)</Label>
+                <Textarea
+                  id="mcom"
+                  rows={2}
+                  value={comentario}
+                  onChange={(e) => setComentario(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button variant="outline" disabled={procesando} onClick={() => setModificando(null)}>
+                  Volver
+                </Button>
+                <Button disabled={procesando} onClick={guardarModificacion}>
+                  Guardar cambios
                 </Button>
               </div>
             </div>
