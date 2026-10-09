@@ -605,6 +605,119 @@ function AdminSolicitudes() {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!cancelando} onOpenChange={(o) => !o && setCancelando(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancelar solicitud aprobada</DialogTitle>
+            <DialogDescription>
+              {empMap.get(cancelando?.employee_id ?? "")?.full_name} ·{" "}
+              {cancelando ? fechaLarga(cancelando.start_date) : ""}. Se liberarán las fechas del
+              calendario
+              {cancelando && cancelando.mode === "dias_completos" && Number(cancelando.days_count) > 0
+                ? " y los días volverán al saldo del empleado"
+                : ""}
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="mc">Motivo de la cancelación</Label>
+              <Textarea
+                id="mc"
+                rows={3}
+                value={motivoCancel}
+                onChange={(e) => setMotivoCancel(e.target.value)}
+                placeholder="Obligatorio. Se notificará al empleado."
+              />
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button variant="outline" disabled={procesando} onClick={() => setCancelando(null)}>
+                Volver
+              </Button>
+              <Button variant="destructive" disabled={procesando} onClick={cancelarAprobada}>
+                Confirmar cancelación
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!modificando} onOpenChange={(o) => !o && setModificando(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Modificar solicitud aprobada</DialogTitle>
+            <DialogDescription>
+              {empMap.get(modificando?.employee_id ?? "")?.full_name} ·{" "}
+              {modificando ? fechaLarga(modificando.start_date) : ""}. El saldo y el calendario se
+              ajustan automáticamente.
+            </DialogDescription>
+          </DialogHeader>
+          {modificando && (
+            <div className="space-y-4">
+              {modificando.mode === "dias_completos" ? (
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="mi">Inicio</Label>
+                    <Input
+                      id="mi"
+                      type="date"
+                      value={nuevoInicio}
+                      onChange={(e) => setNuevoInicio(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="md">Días</Label>
+                    <Input
+                      id="md"
+                      type="number"
+                      min={0}
+                      value={nuevosDias}
+                      onChange={(e) => setNuevosDias(Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="mp">Pago</Label>
+                    <Input
+                      id="mp"
+                      type="date"
+                      value={nuevaPago}
+                      onChange={(e) => setNuevaPago(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <Label htmlFor="mp2">Fecha de pago</Label>
+                  <Input
+                    id="mp2"
+                    type="date"
+                    value={nuevaPago}
+                    onChange={(e) => setNuevaPago(e.target.value)}
+                  />
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="mcom">Comentario para el empleado (opcional)</Label>
+                <Textarea
+                  id="mcom"
+                  rows={2}
+                  value={comentario}
+                  onChange={(e) => setComentario(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Button variant="outline" disabled={procesando} onClick={() => setModificando(null)}>
+                  Volver
+                </Button>
+                <Button disabled={procesando} onClick={guardarModificacion}>
+                  Guardar cambios
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
