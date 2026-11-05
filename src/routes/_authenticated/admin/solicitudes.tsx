@@ -238,11 +238,12 @@ function AdminSolicitudes() {
         .select("id")
         .eq("request_id", s.id)
         .limit(1);
-      if (pagos && pagos.length > 0) {
+      const pagoExistente = pagos?.[0];
+      if (pagoExistente) {
         await supabase
           .from("vacation_payments")
           .update({ payment_date: pago })
-          .eq("id", pagos[0].id);
+          .eq("id", pagoExistente.id);
       } else {
         const { data: emp } = await supabase
           .from("employees")
@@ -255,7 +256,7 @@ function AdminSolicitudes() {
           request_id: s.id,
           payment_date: pago,
           created_by: user?.id ?? null,
-          empresa_id: emp?.empresa_id,
+          ...(emp?.empresa_id ? { empresa_id: emp.empresa_id } : {}),
         });
       }
     }
