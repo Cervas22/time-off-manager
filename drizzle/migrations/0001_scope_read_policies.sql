@@ -1,0 +1,12 @@
+DROP POLICY IF EXISTS p_set_read ON public.app_settings;
+CREATE POLICY p_set_read ON public.app_settings FOR SELECT TO authenticated USING (empresa_id = public.my_empresa_id());
+DROP POLICY IF EXISTS p_areas_read ON public.areas;
+CREATE POLICY p_areas_read ON public.areas FOR SELECT TO authenticated USING (empresa_id = public.my_empresa_id());
+DROP POLICY IF EXISTS p_schedd_read ON public.schedule_days;
+CREATE POLICY p_schedd_read ON public.schedule_days FOR SELECT TO authenticated USING (empresa_id = public.my_empresa_id());
+DROP POLICY IF EXISTS p_sched_read ON public.schedule_templates;
+CREATE POLICY p_sched_read ON public.schedule_templates FOR SELECT TO authenticated USING (empresa_id = public.my_empresa_id());
+DROP POLICY IF EXISTS p_sen_read ON public.seniority_rules;
+CREATE POLICY p_sen_read ON public.seniority_rules FOR SELECT TO authenticated USING (empresa_id = public.my_empresa_id());
+DROP POLICY IF EXISTS cob_sel ON public.plataforma_cobro;
+CREATE POLICY cob_sel ON public.plataforma_cobro FOR SELECT TO authenticated USING (public.is_admin() OR public.is_superadmin());
